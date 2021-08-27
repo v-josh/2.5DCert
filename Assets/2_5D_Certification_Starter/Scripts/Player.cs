@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class Player : MonoBehaviour
 {
@@ -13,6 +14,12 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private float _gravity = 2.0f;
+
+    [SerializeField]
+    private CinemachineVirtualCamera _cmRight;
+
+    [SerializeField]
+    private CinemachineVirtualCamera _cmLeft;
 
     private Vector3 _direction;
     private CharacterController _cc;
@@ -34,6 +41,9 @@ public class Player : MonoBehaviour
         {
             _direction.y -= _gravity;
         }
+
+
+
     }
 
     // Update is called once per frame
@@ -66,23 +76,14 @@ public class Player : MonoBehaviour
             float h = Input.GetAxisRaw("Horizontal");
 
 
-            /*
-            if (h < 0f && _reverseRun == false)
-            {
-                transform.Rotate(new Vector3(0f, 180f, 0f));
-                _reverseRun = true;
-            }
-            else if (h > 0f && _reverseRun == true)
-            {
-                transform.Rotate(new Vector3(0f, 180f, 0f));
-                _reverseRun = false;
-            }*/
 
             if (h != 0)
             {
                 Vector3 facing = transform.localEulerAngles;
                 facing.y = _direction.z > 0 ? 0 : 180;  //if the direction.z is greater than 0, then set facing.y to 0; else, set facing.y to 180
                 transform.localEulerAngles = facing;
+
+
             }
 
             _anim.SetFloat("speed", Mathf.Abs(h));
@@ -124,4 +125,6 @@ public class Player : MonoBehaviour
         _anim.SetBool("ClimbUp", false);
         _cc.enabled = true;
     }
+
+
 }
