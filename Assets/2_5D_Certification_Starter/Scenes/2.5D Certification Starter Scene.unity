@@ -756,8 +756,6 @@ MonoBehaviour:
   _playerSpeed: 9
   _jumpHeight: 12
   _gravity: 30
-  _cmRight: {fileID: 0}
-  _cmLeft: {fileID: 0}
 --- !u!143 &1608386272
 CharacterController:
   m_ObjectHideFlags: 0

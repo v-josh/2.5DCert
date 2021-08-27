@@ -15,17 +15,11 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _gravity = 2.0f;
 
-    [SerializeField]
-    private CinemachineVirtualCamera _cmRight;
-
-    [SerializeField]
-    private CinemachineVirtualCamera _cmLeft;
 
     private Vector3 _direction;
     private CharacterController _cc;
     private Animator _anim;
     private bool _hasJumped = false;
-    private bool _reverseRun = false;
 
     private bool _grabbedLedge = false;
     private LedgeGrab _activeLedge;
