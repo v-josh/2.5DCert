@@ -6,6 +6,7 @@ TagManager:
   tags:
   - LedgeGrab
   - LadderGrab
+  - MovingPlatform
   layers:
   - Default
   - TransparentFX

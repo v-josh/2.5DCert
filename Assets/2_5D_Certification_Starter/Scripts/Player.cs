@@ -41,6 +41,11 @@ public class Player : MonoBehaviour
     private float _originalGravity;
     private bool _changeGravity = false;
 
+    private bool _enableTerminal = false;
+
+    private Transform _platformSide;
+    private MovingPlatform _theMovingPlatform;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -105,10 +110,11 @@ public class Player : MonoBehaviour
         }
 
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) && _enableTerminal == true)
         {
-            //Debug.Log("Player Facing: " + transform.rotation.y);
-            _ladderSpawn = null;
+            //Debug.Log("Pressing R");
+            _theMovingPlatform.MoveToSide(_platformSide);
+            _enableTerminal = false;
         }
 
         if(_spawnToFloor)
@@ -334,6 +340,18 @@ public class Player : MonoBehaviour
         _finalLadderCheck = false;
         _changeGravity = true;
         _cc.enabled = true;
+    }
+
+    public void TerminalContact(bool x)
+    {
+        _enableTerminal = x;
+    }
+
+
+    public void MoveThePlatform(Transform theSide, MovingPlatform mp)
+    {
+        _theMovingPlatform = mp;
+        _platformSide = theSide;
     }
 
 
