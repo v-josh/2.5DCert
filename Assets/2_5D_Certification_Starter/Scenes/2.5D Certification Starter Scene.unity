@@ -21619,6 +21619,7 @@ MonoBehaviour:
   _jumpHeight: 12
   _gravity: 30
   _spawnFromLadder: {fileID: 0}
+  _idleJumpDelay: 1
 --- !u!143 &1608386272
 CharacterController:
   m_ObjectHideFlags: 0
@@ -23024,6 +23025,10 @@ PrefabInstance:
     - target: {fileID: 7441000696612402173, guid: a601004a7697bab4a954d5185cb8fcf7, type: 3}
       propertyPath: _cmRight
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7441000696612402173, guid: a601004a7697bab4a954d5185cb8fcf7, type: 3}
+      propertyPath: _idleJumpDelay
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7441000696612402173, guid: a601004a7697bab4a954d5185cb8fcf7, type: 3}
       propertyPath: _spawnFromLadder

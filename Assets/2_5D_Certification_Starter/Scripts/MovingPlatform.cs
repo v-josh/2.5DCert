@@ -36,12 +36,13 @@ public class MovingPlatform : MonoBehaviour
     {
         //Debug.Log("PointA at: " + _targetA.transform.position + " while PointB is at: " + _targetB.transform.position);
 
+        /*
         if(_targetB != null)
         {
             _target = _targetB;
             //_currentSide = _leftSide;
             
-        }
+        }*/
 
         _maxBufferDistance = (transform.localScale.z / 2.0f);
     }
@@ -85,8 +86,22 @@ public class MovingPlatform : MonoBehaviour
 
     public void MoveToSide(Transform side)
     {
-        _target = side;
-        _startMoving = true;
+
+            _target = side;
+            _startMoving = true;
+
+    }
+
+    public bool CheckSides(Transform side)
+    {
+        if(side == _target)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     void MovethePlatform()

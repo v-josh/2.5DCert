@@ -18,6 +18,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _spawnFromLadder;
 
+    [SerializeField]
+    private float _idleJumpDelay = 1.0f;
+
 
 
     private Vector3 _direction;
@@ -45,6 +48,7 @@ public class Player : MonoBehaviour
 
     private Transform _platformSide;
     private MovingPlatform _theMovingPlatform;
+    private int _currentSide;
 
     // Start is called before the first frame update
     void Start()
@@ -113,8 +117,12 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) && _enableTerminal == true)
         {
             //Debug.Log("Pressing R");
-            _theMovingPlatform.MoveToSide(_platformSide);
-            _enableTerminal = false;
+            if (_theMovingPlatform.CheckSides(_platformSide))
+            {
+                _theMovingPlatform.MoveToSide(_platformSide);
+                _enableTerminal = false;
+                _cc.enabled = false;
+            }
         }
 
         if(_spawnToFloor)
@@ -164,6 +172,22 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                /*
+                if (h != 0)
+                {
+                    _direction.y += _jumpHeight;
+                    _anim.SetBool("Jumping", true);
+                    _hasJumped = true;
+                }
+                else
+                {
+                    _anim.SetBool("Jumping", true);
+
+                    //StartCoroutine("IdleJump");
+                    _direction.y += _jumpHeight;
+                    _hasJumped = true;
+                }*/
+
                 _direction.y += _jumpHeight;
                 _anim.SetBool("Jumping", true);
                 _hasJumped = true;
@@ -345,6 +369,7 @@ public class Player : MonoBehaviour
     public void TerminalContact(bool x)
     {
         _enableTerminal = x;
+        
     }
 
 
@@ -352,6 +377,20 @@ public class Player : MonoBehaviour
     {
         _theMovingPlatform = mp;
         _platformSide = theSide;
+    }
+
+    public void EnableCC()
+    {
+        _cc.enabled = true;
+        
+    }
+
+
+
+    IEnumerator IdleJump()
+    {
+        yield return  new  WaitForSeconds(_idleJumpDelay);
+
     }
 
 

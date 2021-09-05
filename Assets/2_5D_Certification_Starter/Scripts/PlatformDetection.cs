@@ -23,6 +23,13 @@ public class PlatformDetection : MonoBehaviour
                     tx.SetCurrentSide(1);
                 }
             }
+
+            //Player ps = other.transform.GetComponentInChildren<Player>();
+            Player ps = GameObject.FindWithTag("Player").GetComponent<Player>();
+            if(ps != null)
+            {
+                ps.EnableCC();
+            }
         }
     }
 }

@@ -25,17 +25,17 @@ public class Terminal : MonoBehaviour
     private bool _onLeft = false;
     private bool _onRight = false;
 
+    private Player _ps;
+
     private void Start()
     {
         if(_terminalPosition == Position.Left)
         {
             _platformSide = _leftSide;
-            _onLeft = true;
         }
         else if(_terminalPosition == Position.Right)
         {
             _platformSide = _rightSide;
-            _onRight = false;
         }
         else
         {
@@ -49,27 +49,28 @@ public class Terminal : MonoBehaviour
     {
         if(other.tag == "Player")
         {
-            Player ps = other.GetComponentInParent<Player>();
+            _ps = other.GetComponentInParent<Player>();
             MovingPlatform mp = _movingPlatform.GetComponent<MovingPlatform>();
 
-            ps.TerminalContact(true);
+            _ps.TerminalContact(true);
 
             if (_theMiddle == false)
             {
-                ps.MoveThePlatform(_platformSide, mp);
+                _ps.MoveThePlatform(_platformSide, mp);
             }
             else
             {
 
                 if(_currentPosition == Position.Left)
                 {
+                    
                     _platformSide = _rightSide;
-                    ps.MoveThePlatform(_platformSide, mp);
+                    _ps.MoveThePlatform(_platformSide, mp);
                 }
                 else if (_currentPosition == Position.Right)
                 {
                     _platformSide = _leftSide;
-                    ps.MoveThePlatform(_platformSide, mp);
+                    _ps.MoveThePlatform(_platformSide, mp);
                 }
                 
                 /*
@@ -95,8 +96,8 @@ public class Terminal : MonoBehaviour
     {
         if(other.tag == "Player")
         {
-            Player ps = other.GetComponentInParent<Player>();
-            ps.TerminalContact(false);
+            _ps = other.GetComponentInParent<Player>();
+            _ps.TerminalContact(false);
         }
     }
 
@@ -110,5 +111,11 @@ public class Terminal : MonoBehaviour
         {
             _currentPosition = Position.Right;
         }
+
+    }
+
+    public int GetCurrentPosition()
+    {
+        return ((int)_currentPosition);
     }
 }
