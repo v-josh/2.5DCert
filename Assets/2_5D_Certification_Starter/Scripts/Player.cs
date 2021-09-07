@@ -21,8 +21,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _idleJumpDelay = 1.0f;
 
+    [SerializeField]
+    private Canvas _theUI;
+
+    [SerializeField]
+    private GameObject _gameManager;
 
 
+    private float _horizontalInput;
     private Vector3 _direction;
     private CharacterController _cc;
     private Animator _anim;
@@ -48,7 +54,21 @@ public class Player : MonoBehaviour
 
     private Transform _platformSide;
     private MovingPlatform _theMovingPlatform;
-    private int _currentSide;
+
+
+    private bool _isRolling = false;
+    private Collider _rollingCollider;
+
+    private bool _playerCanMove = true;
+    private bool _atIdleState = false;
+
+
+    private GameObject _currentLiftTarget;
+
+
+    private UIManager _ui;
+    private GameObject[] _liftStops;
+
 
     // Start is called before the first frame update
     void Start()
@@ -64,7 +84,18 @@ public class Player : MonoBehaviour
             _direction.y -= _gravity;
         }
 
-        
+        _ui = _theUI.GetComponent<UIManager>();
+
+        if(_ui)
+        {
+            //Debug.Log("UI manager found");
+        }
+
+        //Debug.Log("Idle is at: " + _anim.GetInteger("Base Layer.Idle"));
+        //Debug.Log("Idle is at: " + _anim.GetLayerIndex("Base Layer.Running"));
+        //Debug.Log("Anim name is: " + _anim.GetCurr);
+
+
 
 
     }
@@ -72,10 +103,19 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(_atIdleState)
+        {
+            _horizontalInput = 0f;
+
+        }
+
         if (!_eToLadder)
         {
 
-            CalculateMovement();
+            if (_playerCanMove)
+            {
+                CalculateMovement();
+            }
         }
         else
         {
@@ -116,12 +156,24 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R) && _enableTerminal == true)
         {
-            //Debug.Log("Pressing R");
-            if (_theMovingPlatform.CheckSides(_platformSide))
+           // Debug.Log("Pressing R");
+            if (_theMovingPlatform != null)
             {
-                _theMovingPlatform.MoveToSide(_platformSide);
-                _enableTerminal = false;
-                _cc.enabled = false;
+                if (_theMovingPlatform.GetMoveSideToSide())
+                {
+                    if (_theMovingPlatform.CheckSides(_platformSide) == true)
+                    {
+                        _theMovingPlatform.MoveToSide(_platformSide);
+                        LiftMovement();
+                    }
+                }
+                else
+                {
+
+                    //Debug.Log("Inside Pressing R while false");
+                    _ui.SetElevatorMenu(true);
+                    LiftMovement();
+                }
             }
         }
 
@@ -130,6 +182,16 @@ public class Player : MonoBehaviour
             GetOffLadder();
         }
 
+    }
+
+    void LiftMovement()
+    {
+        _enableTerminal = false;
+        _cc.enabled = false;
+        _playerCanMove = false;
+        _atIdleState = true;
+        _anim.Play("Base Layer.Idle", 0, 0.25f);
+        _anim.SetFloat("speed", 0f);
     }
 
     void CalculateMovement()
@@ -154,11 +216,11 @@ public class Player : MonoBehaviour
             }
 
 
-            float h = Input.GetAxisRaw("Horizontal");
+            _horizontalInput = Input.GetAxisRaw("Horizontal");
 
 
 
-            if (h != 0)
+            if (_horizontalInput != 0)
             {
                 Vector3 facing = transform.localEulerAngles;
                 facing.y = _direction.z > 0 ? 0 : 180;  //if the direction.z is greater than 0, then set facing.y to 0; else, set facing.y to 180
@@ -167,8 +229,9 @@ public class Player : MonoBehaviour
 
             }
 
-            _anim.SetFloat("speed", Mathf.Abs(h));
-            _direction = new Vector3(0, 0, h) * _playerSpeed;
+                _anim.SetFloat("speed", Mathf.Abs(_horizontalInput));
+                _direction = new Vector3(0, 0, _horizontalInput) * _playerSpeed;
+
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -191,6 +254,14 @@ public class Player : MonoBehaviour
                 _direction.y += _jumpHeight;
                 _anim.SetBool("Jumping", true);
                 _hasJumped = true;
+            }
+
+            if(Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                //_cc.enabled = false;
+                _anim.SetBool("Rolling", true);
+                _isRolling = true;
+                //StartCoroutine("IdleJump");
             }
             
             
@@ -337,10 +408,7 @@ public class Player : MonoBehaviour
         _spawnFromLadder = go;
 
         _anim.SetBool("LadderTop", true);             //Enable this line while disable the next line to enable climbing up animation
-        //LadderComplete();
 
-        //_anim.SetBool("LadderClimb", false);
-        //_anim.enabled = true;
 
 
     }
@@ -370,6 +438,14 @@ public class Player : MonoBehaviour
     {
         _enableTerminal = x;
         
+        if (_theMovingPlatform != null)
+        {
+            if (_theMovingPlatform.GetMoveSideToSide() == false)
+            {
+                _ui.SetElevatorMenu(false);
+            }
+        }
+        
     }
 
 
@@ -379,19 +455,80 @@ public class Player : MonoBehaviour
         _platformSide = theSide;
     }
 
+    public void GetMovingPlat(MovingPlatform mp)
+    {
+        _theMovingPlatform = mp;
+    }
+
     public void EnableCC()
     {
         _cc.enabled = true;
+        _playerCanMove = true;
+        _atIdleState = false;
         
     }
 
-
-
-    IEnumerator IdleJump()
+    
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        yield return  new  WaitForSeconds(_idleJumpDelay);
-
+        
+        if(_isRolling == true && hit.collider.tag == "Rolling")
+        {
+            _rollingCollider = hit.collider;
+            _rollingCollider.isTrigger = true;
+        }       
     }
+
+    
+
+
+    public void StopRolling()
+    {
+        if (_rollingCollider != null)
+        {
+            _rollingCollider.isTrigger = false;
+        }
+        _isRolling = false;
+        _anim.SetBool("Rolling", false);
+    }
+
+
+    public void SetLiftFloors(GameObject[] x)
+    {
+        _liftStops = x;
+    }
+
+
+    public void StartLift(int x)
+    {
+        int floor = x - 1;
+        
+        if(_liftStops[floor] != null)
+        {
+            if (_theMovingPlatform.CheckLift(_liftStops[floor].transform) == true)
+            {
+                _currentLiftTarget = _liftStops[floor];
+                _theMovingPlatform.MoveToSide(_liftStops[floor].transform);
+                _ui.SetElevatorMenu(false);
+                LiftMovement();
+            }
+            else
+            {
+                Debug.Log("Inside False Check Left");
+                _ui.SetElevatorMenu(false);
+                EnableCC();
+            }
+        }
+
+        //Debug.Log("Going to Floor " + floor);
+    }
+
+    public GameObject CheckLiftTarget()
+    {
+        return _currentLiftTarget;
+    }
+
+
 
 
 }

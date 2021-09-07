@@ -7,6 +7,8 @@ TagManager:
   - LedgeGrab
   - LadderGrab
   - MovingPlatform
+  - Rolling
+  - Elevator
   layers:
   - Default
   - TransparentFX

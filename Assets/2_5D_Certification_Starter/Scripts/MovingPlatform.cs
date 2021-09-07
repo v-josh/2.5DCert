@@ -23,12 +23,20 @@ public class MovingPlatform : MonoBehaviour
     [SerializeField]
     private float _maxBufferDistance = 0.5f;
 
+    [SerializeField]
+    private bool _moveSideToSide = false;
+
     //Private Variable
     private Transform _target;
     private bool _switching = false;
     private GameObject _currentSide;
 
     private bool _startMoving = false;
+    private GameObject _currentLiftFloor;
+
+
+
+    
     
 
     // Start is called before the first frame update
@@ -44,7 +52,11 @@ public class MovingPlatform : MonoBehaviour
             
         }*/
 
-        _maxBufferDistance = (transform.localScale.z / 2.0f);
+        if (_moveSideToSide)
+        {
+            _maxBufferDistance = (transform.localScale.z / 2.0f);
+        }
+
     }
 
     // Update is called once per frame
@@ -104,46 +116,60 @@ public class MovingPlatform : MonoBehaviour
         }
     }
 
+    public bool CheckLift(Transform floor)
+    {
+        if(_currentLiftFloor.transform == floor)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public void SetCurrentFloor(GameObject floor)
+    {
+        
+        _currentLiftFloor = floor;
+        Debug.Log("CurrentLiftFloor name is: " + _currentLiftFloor.gameObject.name);
+    }
+
     void MovethePlatform()
     {
         if(_target != null)
         {
-            if (Vector3.Distance(transform.position, _target.localPosition) > _maxBufferDistance)
+            if (_moveSideToSide)
             {
+                if (Vector3.Distance(transform.position, _target.localPosition) > _maxBufferDistance)
+                {
 
-                transform.position = Vector3.MoveTowards(transform.position, _target.position, _speed * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(transform.position, _target.position, _speed * Time.deltaTime);
+                }
+            }
+            else
+            {
+                Vector3 targetLift = new Vector3(transform.position.x, _target.position.y, transform.position.z);
+
+                if (Vector3.Distance(transform.position, targetLift) > _maxBufferDistance)
+                {
+
+                    transform.position = Vector3.MoveTowards(transform.position, targetLift, _speed * Time.deltaTime);
+                }
+                else
+                {
+                    
+                }
+
             }
         }
     }
 
-
-    
-
-
-
-    private void FixedUpdate()
+    public bool GetMoveSideToSide()
     {
-        /*
-        if (_switching == false)
-        {
-
-            transform.position = Vector3.MoveTowards(transform.position, _targetB.position, _speed * Time.deltaTime);
-        }
-        else if (_switching == true)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, _targetA.position, _speed * Time.deltaTime);
-        }
-
-        if (transform.position == _targetB.position)
-        {
-            _switching = true;
-        }
-        else if (transform.position == _targetA.position)
-        {
-            _switching = false;
-        }
-        */
+        return _moveSideToSide;
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -160,4 +186,6 @@ public class MovingPlatform : MonoBehaviour
             other.transform.parent = null;
         }
     }
+
+    
 }
