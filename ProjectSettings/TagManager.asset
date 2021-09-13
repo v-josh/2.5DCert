@@ -9,6 +9,7 @@ TagManager:
   - MovingPlatform
   - Rolling
   - Elevator
+  - Container
   layers:
   - Default
   - TransparentFX

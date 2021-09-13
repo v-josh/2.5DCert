@@ -132,7 +132,7 @@ public class MovingPlatform : MonoBehaviour
     {
         
         _currentLiftFloor = floor;
-        Debug.Log("CurrentLiftFloor name is: " + _currentLiftFloor.gameObject.name);
+        //Debug.Log("CurrentLiftFloor name is: " + _currentLiftFloor.gameObject.name);
     }
 
     void MovethePlatform()
@@ -178,6 +178,8 @@ public class MovingPlatform : MonoBehaviour
             other.transform.parent = this.transform;
         }
     }
+
+
 
     private void OnTriggerExit(Collider other)
     {

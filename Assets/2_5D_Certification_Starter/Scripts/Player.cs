@@ -27,6 +27,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _gameManager;
 
+    [SerializeField]
+    private float _pushingPower = 2.0f;
+
 
     private float _horizontalInput;
     private Vector3 _direction;
@@ -68,6 +71,9 @@ public class Player : MonoBehaviour
 
     private UIManager _ui;
     private GameObject[] _liftStops;
+
+
+    
 
 
     // Start is called before the first frame update
@@ -476,8 +482,39 @@ public class Player : MonoBehaviour
         {
             _rollingCollider = hit.collider;
             _rollingCollider.isTrigger = true;
-        }       
+        }
+
+
+        if (hit.transform.tag == "Container")
+        {
+            /*
+            Rigidbody rb = hit.collider.attachedRigidbody;
+            if (rb != null)
+            {
+
+                //Vector3 pushDir = new Vector3(hit.moveDirection.x, 0f, 0f);
+                Vector3 pushDir = new Vector3(0f, 0f, hit.moveDirection.z);
+                Debug.Log("PushDir is at: " + pushDir);
+
+                rb.velocity = pushDir * _pushingPower * Time.deltaTime;
+            }
+            */
+
+            /*
+            CharacterController containerCC = hit.gameObject.GetComponent<CharacterController>();
+            if(containerCC != null)
+            {
+                //Debug.Log("Able to locate CC");
+                Vector3 pushDir = new Vector3(0f, 0f, hit.moveDirection.z);
+                containerCC.Move(pushDir * _pushingPower * Time.deltaTime);
+
+            }
+            */
+        }
+
     }
+
+
 
     
 
@@ -529,6 +566,20 @@ public class Player : MonoBehaviour
     }
 
 
+    public void PushStart()
+    {
+        _anim.SetBool("Pushing", true);
+    }
+
+    public void PushEnd()
+    {
+        _anim.SetBool("Pushing", false);
+    }
+
+    public float GetPlayerDirection()
+    {
+        return _horizontalInput;
+    }
 
 
 }
